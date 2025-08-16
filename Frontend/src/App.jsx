@@ -8,6 +8,7 @@ import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import './App.css'
 
+
 function App() {
   const [count, setCount] = useState(0)
   const [code, setCode] = useState(`function sum() {function sum() { return 1 + 1; }
@@ -21,10 +22,16 @@ function App() {
   })
 
 
-async function reviewCode() {
-  const response = await axios.post(process.env.BACKEND_URL, {code})
-  setreview(response.data);
-}
+  async function reviewCode() {
+    try {
+      console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL, { code });
+      setreview(response.data);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
+  
   return (
     <>
     <main>
