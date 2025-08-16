@@ -4,6 +4,8 @@ import prism from 'prismjs'
 import Editor from 'react-simple-code-editor'
 import axios from "axios";
 import Markdown from 'react-markdown'
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css";
 import './App.css'
 
 function App() {
@@ -48,7 +50,9 @@ async function reviewCode() {
         onClick={reviewCode}>Review</div>
       </div>
       <div className="right">
-        <Markdown>{review}</Markdown>
+        <Markdown
+         rehypePlugins={[ rehypeHighlight ]}
+        >{review}</Markdown>
         </div>
 
     </main>
