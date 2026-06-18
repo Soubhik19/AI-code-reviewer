@@ -89,7 +89,8 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ""
       const response = await axios.post<string>(`${backendUrl}/ai/get-review`, {
-        code: `${language}\n\n${code}`,
+        language,
+        code,
       })
       const data = response.data
       setReview(typeof data === "string" ? data : JSON.stringify(data))
@@ -105,7 +106,12 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
 
   const handleCopy = useCallback(async () => {
     if (!review) return
-    await navigator.clipboard.writeText(review)
+    // Extract only the refactored code block from ## 🚀 Refactored Code section
+    const refactoredMatch = review.match(
+      /##\s*🚀\s*Refactored Code[\s\S]*?```[\w]*\n([\s\S]*?)```/
+    )
+    const textToCopy = refactoredMatch ? refactoredMatch[1].trim() : review
+    await navigator.clipboard.writeText(textToCopy)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [review])
