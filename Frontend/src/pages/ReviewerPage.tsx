@@ -7,7 +7,7 @@ import rehypeHighlight from "rehype-highlight"
 import "prismjs/themes/prism-tomorrow.css"
 import "highlight.js/styles/github-dark.css"
 import ScoreDashboard, { type ScoreData } from "@/components/ScoreDashboard"
-import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
+import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from "react-resizable-panels"
 
 import {
   ArrowLeft,
@@ -211,7 +211,7 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
 
       {/* Main panels */}
       <div className="flex flex-1 overflow-hidden">
-        <PanelGroup direction="horizontal">
+        <PanelGroup orientation="horizontal">
           {/* Left: Code Editor Panel */}
           <Panel defaultSize={50} minSize={20} className="flex flex-col">
             {/* Panel header */}
