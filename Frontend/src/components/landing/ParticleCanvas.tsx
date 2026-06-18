@@ -9,25 +9,39 @@ const COLORS = [
   "oklch(0.68 0.2 50)",    // orange
 ]
 
-const PARTICLE_COUNT = 1000;
-const RING_RADIUS = 380;
-const REPULSION_RADIUS = 150;
-const RETURN_SPEED = 0.04;
-
 interface Particle {
-  x: number;
-  y: number;
-  angle: number;
-  speed: number;
-  color: string;
-  radius: number;
-  wobbleSpeed: number;
-  wobbleAmp: number;
-  wobbleOffset: number;
+  x: number
+  y: number
+  vx: number
+  vy: number
+  w: number
+  h: number
+  color: string
+  angle: number
+  rotSpeed: number
+  alpha: number
+}
+
+function createParticle(width: number, height: number): Particle {
+  return {
+    x: Math.random() * width,
+    y: Math.random() * height,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    w: Math.random() * 5 + 2,
+    h: Math.random() * 2 + 1,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    angle: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.015,
+    alpha: Math.random() * 0.4 + 0.15,
+  }
 }
 
 export function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const mouse = useRef({ x: -9999, y: -9999 })
+  const particles = useRef<Particle[]>([])
+  const rafId = useRef<number>(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -35,106 +49,94 @@ export function ParticleCanvas() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    let animationFrameId: number
-    let width = canvas.offsetWidth
-    let height = canvas.offsetHeight
-
-    const mouse = { x: -1000, y: -1000 }
-
-    const handleResize = () => {
-      width = window.innerWidth
-      height = window.innerHeight
-      canvas.width = width
-      canvas.height = height
+    const resize = () => {
+      canvas.width = canvas.offsetWidth
+      canvas.height = canvas.offsetHeight
+      // Repopulate if empty or drastically resized
+      const count = Math.floor((canvas.width * canvas.height) / 10000)
+      particles.current = Array.from({ length: Math.min(count, 120) }, () =>
+        createParticle(canvas.width, canvas.height)
+      )
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(canvas)
+
+    const onMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
-      mouse.x = e.clientX - rect.left
-      mouse.y = e.clientY - rect.top
+      mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
-
-    const handleMouseLeave = () => {
-      mouse.x = -1000
-      mouse.y = -1000
+    const onMouseLeave = () => {
+      mouse.current = { x: -9999, y: -9999 }
     }
+    window.addEventListener("mousemove", onMouseMove)
+    window.addEventListener("mouseleave", onMouseLeave)
 
-    window.addEventListener("resize", handleResize)
-    window.addEventListener("mousemove", handleMouseMove)
-    window.addEventListener("mouseleave", handleMouseLeave)
+    const REPEL_RADIUS = 150
+    const REPEL_STRENGTH = 1.0
 
-    handleResize()
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // Initialize particles
-    const particles: Particle[] = []
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const angle = Math.random() * Math.PI * 2
-      const radiusOffset = (Math.random() - 0.5) * 80
-      const startRadius = RING_RADIUS + radiusOffset
-      
-      particles.push({
-        x: width / 2 + Math.cos(angle) * startRadius,
-        y: height / 2 + Math.sin(angle) * startRadius,
-        angle: angle,
-        speed: (Math.random() * 0.002 + 0.0005) * (Math.random() > 0.5 ? 1 : -1),
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        radius: Math.random() * 1.5 + 1.0,
-        wobbleSpeed: Math.random() * 1.5 + 0.5,
-        wobbleAmp: Math.random() * 40,
-        wobbleOffset: Math.random() * Math.PI * 2,
-      })
-    }
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height)
-
-      const centerX = width / 2
-      const centerY = height / 2
-      const time = performance.now() * 0.001
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
-        p.angle += p.speed
-
-        // Calculate natural orbit position
-        const currentRadius = RING_RADIUS + Math.sin(time * p.wobbleSpeed + p.wobbleOffset) * p.wobbleAmp
-        const targetX = centerX + Math.cos(p.angle) * currentRadius
-        const targetY = centerY + Math.sin(p.angle) * currentRadius
-
-        // Float towards target
-        p.x += (targetX - p.x) * RETURN_SPEED
-        p.y += (targetY - p.y) * RETURN_SPEED
-
+      for (const p of particles.current) {
         // Mouse repulsion
-        const dx = p.x - mouse.x
-        const dy = p.y - mouse.y
+        const dx = p.x - mouse.current.x
+        const dy = p.y - mouse.current.y
         const dist = Math.sqrt(dx * dx + dy * dy)
-
-        if (dist < REPULSION_RADIUS && dist > 0) {
-          const force = (REPULSION_RADIUS - dist) / REPULSION_RADIUS
-          p.x += (dx / dist) * force * 15
-          p.y += (dy / dist) * force * 15
+        if (dist < REPEL_RADIUS && dist > 0) {
+          const force = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_STRENGTH
+          // Direct position push for snappy magnetic feel
+          p.x += (dx / dist) * force * 10
+          p.y += (dy / dist) * force * 10
+          // Also add some velocity so they drift away smoothly
+          p.vx += (dx / dist) * force * 0.5
+          p.vy += (dy / dist) * force * 0.5
         }
 
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+        // Dampen velocity
+        p.vx *= 0.98
+        p.vy *= 0.98
+
+        // Keep a minimum drift
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy)
+        if (speed < 0.05) {
+          p.vx += (Math.random() - 0.5) * 0.04
+          p.vy += (Math.random() - 0.5) * 0.04
+        }
+
+        p.x += p.vx
+        p.y += p.vy
+        p.angle += p.rotSpeed
+
+        // Wrap around edges
+        if (p.x < -10) p.x = canvas.width + 10
+        if (p.x > canvas.width + 10) p.x = -10
+        if (p.y < -10) p.y = canvas.height + 10
+        if (p.y > canvas.height + 10) p.y = -10
+
+        // Draw dash/rectangle
+        ctx.save()
+        ctx.globalAlpha = p.alpha
         ctx.fillStyle = p.color
-        // Add a subtle glow
         ctx.shadowColor = p.color
         ctx.shadowBlur = 4
-        ctx.fill()
+        ctx.translate(p.x, p.y)
+        ctx.rotate(p.angle)
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h)
+        ctx.restore()
       }
 
-      animationFrameId = requestAnimationFrame(render)
+      rafId.current = requestAnimationFrame(draw)
     }
 
-    render()
+    draw()
 
     return () => {
-      window.removeEventListener("resize", handleResize)
-      window.removeEventListener("mousemove", handleMouseMove)
-      window.removeEventListener("mouseleave", handleMouseLeave)
-      cancelAnimationFrame(animationFrameId)
+      cancelAnimationFrame(rafId.current)
+      ro.disconnect()
+      window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("mouseleave", onMouseLeave)
     }
   }, [])
 
