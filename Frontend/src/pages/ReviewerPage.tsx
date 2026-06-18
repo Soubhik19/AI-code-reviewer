@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, type ReactNode } from "react"
 import axios from "axios"
 import Editor from "react-simple-code-editor"
 import Prism from "prismjs"
@@ -70,6 +70,40 @@ function highlightCode(code: string, lang: string): string {
   } catch {
     return code
   }
+}
+
+/** Extracts raw text from React children nodes (for code blocks) */
+function extractText(node: ReactNode): string {
+  if (typeof node === "string") return node
+  if (typeof node === "number") return String(node)
+  if (!node) return ""
+  if (Array.isArray(node)) return node.map(extractText).join("")
+  if (typeof node === "object" && "props" in node) {
+    return extractText((node as React.ReactElement).props.children)
+  }
+  return ""
+}
+
+/** Inline copy button that appears on hover over each code block */
+function CopyCodeButton({ children }: { children: ReactNode }) {
+  const [done, setDone] = useState(false)
+
+  const handleCopyBlock = async () => {
+    const text = extractText(children).trim()
+    await navigator.clipboard.writeText(text)
+    setDone(true)
+    setTimeout(() => setDone(false), 2000)
+  }
+
+  return (
+    <button
+      onClick={handleCopyBlock}
+      className="absolute right-2 top-2 z-10 rounded-md border border-white/10 bg-white/5 p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-white/10 hover:text-foreground group-hover:opacity-100"
+      title="Copy code"
+    >
+      {done ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+    </button>
+  )
 }
 
 export default function ReviewerPage({ onBack }: ReviewerPageProps) {
@@ -274,7 +308,19 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
 
             {reviewState === "success" && review && (
               <div className="review-output">
-                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{review}</ReactMarkdown>
+                <ReactMarkdown
+                  rehypePlugins={[rehypeHighlight]}
+                  components={{
+                    pre({ children }) {
+                      return (
+                        <div className="relative group">
+                          <CopyCodeButton>{children}</CopyCodeButton>
+                          <pre>{children}</pre>
+                        </div>
+                      )
+                    },
+                  }}
+                >{review}</ReactMarkdown>
               </div>
             )}
           </div>
