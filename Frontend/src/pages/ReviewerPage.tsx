@@ -42,6 +42,7 @@ const LANGUAGES = [
   { value: "java", label: "Java", icon: "☕" },
   { value: "rust", label: "Rust", icon: "🦀" },
   { value: "cpp", label: "C++", icon: "⚙️" },
+  { value: "solidity", label: "Solidity", icon: "💎" },
 ]
 
 function getGrammar(lang: string) {
