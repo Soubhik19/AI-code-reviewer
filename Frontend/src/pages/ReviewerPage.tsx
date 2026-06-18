@@ -134,8 +134,7 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ""
       const response = await axios.post<string>(`${backendUrl}/ai/get-review`, {
-        language,
-        code,
+        code: `Language: ${language}\n\n${code}`,
       })
       const data = response.data
       setReview(typeof data === "string" ? data : JSON.stringify(data))
