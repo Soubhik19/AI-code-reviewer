@@ -3,7 +3,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash',
+  model: 'gemini-2.5-flash',
   systemInstruction: `
 You are an expert Senior Code Reviewer with over 7 years of professional development experience.
 Your role is to analyze, review, and improve code written by developers.
