@@ -4,6 +4,7 @@ import Editor from "react-simple-code-editor"
 import Prism from "prismjs"
 import ReactMarkdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight"
+import hljs from "highlight.js"
 import "prismjs/themes/prism-tomorrow.css"
 import "highlight.js/styles/github-dark.css"
 import ScoreDashboard, { type ScoreData } from "@/components/ScoreDashboard"
@@ -145,6 +146,19 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
         : "An unexpected error occurred."
       setError(msg)
       setReviewState("error")
+    }
+  }, [code, language])
+
+  // Auto-detect language
+  useEffect(() => {
+    if (code.trim().length > 15) {
+      const timeout = setTimeout(() => {
+        const detected = hljs.highlightAuto(code, LANGUAGES.map(l => l.value))
+        if (detected.language && detected.language !== language) {
+          setLanguage(detected.language)
+        }
+      }, 500)
+      return () => clearTimeout(timeout)
     }
   }, [code, language])
 
@@ -307,7 +321,7 @@ async function fetchUser(id) {
           </PanelResizeHandle>
 
           {/* Right: Review Output Panel */}
-          <Panel minSize={20} className="flex flex-col bg-[oklch(0.10_0.03_265)]">
+          <Panel defaultSize={50} minSize={20} className="flex flex-col bg-[oklch(0.10_0.03_265)]">
             {/* Panel header */}
             <div className="flex shrink-0 items-center border-b border-white/8 bg-black/10 px-4 py-2.5">
               <div className="flex items-center gap-2">
