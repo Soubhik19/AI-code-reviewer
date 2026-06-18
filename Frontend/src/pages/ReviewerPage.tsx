@@ -240,31 +240,11 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
         {/* Right: Review Output */}
         <div className="flex flex-col md:w-1/2">
           {/* Panel header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-4 py-2.5">
+          <div className="flex shrink-0 items-center border-b border-white/8 px-4 py-2.5">
             <div className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-green-400" />
               <span className="text-xs font-medium text-muted-foreground">Review</span>
             </div>
-            {reviewState === "success" && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-              >
-                {copied ? (
-                  <>
-                    <Check className="size-3" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="size-3" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            )}
           </div>
 
           {/* Content */}
