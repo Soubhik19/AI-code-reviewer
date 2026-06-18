@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight"
 import "prismjs/themes/prism-tomorrow.css"
 import "highlight.js/styles/github-dark.css"
+import ScoreDashboard, { type ScoreData } from "@/components/ScoreDashboard"
 
 import {
   ArrowLeft,
@@ -104,6 +105,28 @@ function CopyCodeButton({ children }: { children: ReactNode }) {
       {done ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
     </button>
   )
+}
+
+function extractScores(markdown: string): ScoreData | null {
+  const scores: ScoreData = {
+    readability: 0, performance: 0, security: 0, bestPractices: 0,
+    reasons: { readability: "", performance: "", security: "", bestPractices: "" }
+  }
+  let hasScores = false
+  
+  const readMatch = markdown.match(/\|\s*Readability\s*\|\s*(\d+)\/10\s*\|\s*(.*?)\s*\|/i)
+  if (readMatch) { scores.readability = parseInt(readMatch[1]); scores.reasons.readability = readMatch[2].trim(); hasScores = true }
+  
+  const perfMatch = markdown.match(/\|\s*Performance\s*\|\s*(\d+)\/10\s*\|\s*(.*?)\s*\|/i)
+  if (perfMatch) { scores.performance = parseInt(perfMatch[1]); scores.reasons.performance = perfMatch[2].trim(); hasScores = true }
+  
+  const secMatch = markdown.match(/\|\s*Security\s*\|\s*(\d+)\/10\s*\|\s*(.*?)\s*\|/i)
+  if (secMatch) { scores.security = parseInt(secMatch[1]); scores.reasons.security = secMatch[2].trim(); hasScores = true }
+  
+  const bpMatch = markdown.match(/\|\s*Best Practices\s*\|\s*(\d+)\/10\s*\|\s*(.*?)\s*\|/i)
+  if (bpMatch) { scores.bestPractices = parseInt(bpMatch[1]); scores.reasons.bestPractices = bpMatch[2].trim(); hasScores = true }
+  
+  return hasScores ? scores : null
 }
 
 export default function ReviewerPage({ onBack }: ReviewerPageProps) {
@@ -289,7 +312,13 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
                       )
                     },
                   }}
-                >{review}</ReactMarkdown>
+                >
+                  {review.replace(/## 📊 Score[\s\S]*?(?=(##|$))/i, "").trim()}
+                </ReactMarkdown>
+
+                {extractScores(review) && (
+                  <ScoreDashboard data={extractScores(review)!} />
+                )}
               </div>
             )}
           </div>
