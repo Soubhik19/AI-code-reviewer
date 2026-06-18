@@ -18,7 +18,7 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="px-4 py-24 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="scroll-reveal px-4 py-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-14 text-center">
@@ -43,7 +43,7 @@ export function HowItWorks() {
           />
 
           {STEPS.map((step, i) => (
-            <div key={i} className="flex flex-col items-center gap-4 text-center md:items-center">
+            <div key={i} className="flex flex-col items-center gap-4 text-center md:items-center scroll-reveal-card" style={{ transitionDelay: `${i * 150}ms` }}>
               {/* Number circle */}
               <div className="relative flex size-12 items-center justify-center rounded-full border border-brand/30 bg-brand/10 font-mono text-sm font-bold text-brand-light">
                 {step.number}

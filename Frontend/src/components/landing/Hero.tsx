@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react"
 import { AlertCircle, CheckCircle, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ParticleCanvas } from "./ParticleCanvas"
+import LottieAnim from "./LottieAnim"
+import heroAnimation from "../../../public/hero-animation.json"
 
 interface HeroProps {
   onStartReviewing: () => void
@@ -13,6 +15,39 @@ const TYPE_SPEED = 80
 const DELETE_SPEED = 45
 const PAUSE_AFTER_TYPE = 2000
 const PAUSE_AFTER_DELETE = 600
+
+const CODE_LINES = [
+  "const app = express();",
+  "function mergeSort(arr) {",
+  "  if (arr.length <= 1) return arr;",
+  "  const mid = Math.floor(arr.length / 2);",
+  "  return merge(mergeSort(arr.slice(0, mid)),",
+  "    mergeSort(arr.slice(mid)));",
+  "}",
+  "async function fetchData(url) {",
+  "  const res = await fetch(url);",
+  "  return res.json();",
+  "}",
+  "class Node { constructor(val) {",
+  "  this.val = val; this.next = null;",
+  "}}",
+  "import React from 'react';",
+  "const [state, setState] = useState(0);",
+  "export default function App() {",
+  "  return <div>Hello World</div>;",
+  "}",
+  "router.get('/api/users', async (req, res) => {",
+  "  const users = await User.find();",
+  "  res.json(users);",
+  "});",
+  "def quicksort(arr):",
+  "  if len(arr) <= 1: return arr",
+  "  pivot = arr[len(arr) // 2]",
+  "  return quicksort(left) + middle + quicksort(right)",
+  "fn main() { println!(\"Hello\"); }",
+  "type Result<T> = Ok(T) | Err(Error);",
+  "interface User { id: string; name: string; }",
+]
 
 function useTypewriter(text: string) {
   const [displayed, setDisplayed] = useState("")
@@ -67,7 +102,16 @@ export function Hero({ onStartReviewing }: HeroProps) {
   const { displayed, showCursor } = useTypewriter(TYPEWRITER_TEXT)
 
   return (
-    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-4 pt-16 text-center sm:px-6 lg:px-8">
+    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-4 pt-16 sm:px-6 lg:px-8">
+      {/* Scrolling code lines background */}
+      <div aria-hidden className="code-rain-container">
+        <div className="code-rain">
+          {[...CODE_LINES, ...CODE_LINES].map((line, i) => (
+            <div key={i} className="code-rain-line">{line}</div>
+          ))}
+        </div>
+      </div>
+
       {/* Particle background */}
       <ParticleCanvas />
 
@@ -94,75 +138,89 @@ export function Hero({ onStartReviewing }: HeroProps) {
         }}
       />
 
-      <div className="relative z-10 flex max-w-4xl flex-col items-center gap-6">
-        {/* Eyebrow badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 px-4 py-1.5 text-sm text-brand-light">
-          <span className="pulse-dot size-2 rounded-full bg-brand" />
-          AI-Powered Code Analysis
+      {/* Two-column hero layout */}
+      <div className="relative z-10 flex w-full max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-14">
+        {/* LEFT column — all existing content */}
+        <div className="hero-content flex flex-1 flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+          {/* Eyebrow badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 px-4 py-1.5 text-sm text-brand-light">
+            <span className="pulse-dot size-2 rounded-full bg-brand" />
+            AI-Powered Code Analysis
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            Your code reviewed
+            <br />
+            <span className="gradient-text-animated">
+              {displayed}
+              <span
+                style={{
+                  opacity: showCursor ? 1 : 0,
+                  transition: "opacity 0.1s",
+                  marginLeft: "2px",
+                }}
+              >
+                |
+              </span>
+            </span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
+            Paste your code and get senior-level feedback in seconds. Bugs, security issues,
+            performance — caught before they ship.
+          </p>
+
+          {/* CTA buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+            <Button
+              size="lg"
+              onClick={onStartReviewing}
+              className="bg-brand text-primary-foreground hover:bg-brand-light gap-2 px-7 font-semibold transition-all hover:scale-105"
+            >
+              Review my code →
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
+              className="gap-2 border-white/10 bg-white/5 text-foreground hover:bg-white/10"
+            >
+              <a
+                href="https://github.com/Soubhik19/AI-code-reviewer"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                </svg>
+                CodeSensei — AI Code Reviewer
+              </a>
+            </Button>
+          </div>
+
+          {/* Language badges */}
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            {LANGUAGES.map((lang) => (
+              <span
+                key={lang}
+                className="rounded-full border border-white/8 bg-white/4 px-3 py-1 text-xs font-medium text-muted-foreground"
+              >
+                {lang}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-          Your code reviewed
-          <br />
-          <span className="gradient-text">
-            {displayed}
-            <span
-              style={{
-                opacity: showCursor ? 1 : 0,
-                transition: "opacity 0.1s",
-                marginLeft: "2px",
-              }}
-            >
-              |
-            </span>
-          </span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-          Paste your code and get senior-level feedback in seconds. Bugs, security issues,
-          performance — caught before they ship.
-        </p>
-
-        {/* CTA buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Button
-            size="lg"
-            onClick={onStartReviewing}
-            className="bg-brand text-primary-foreground hover:bg-brand-light gap-2 px-7 font-semibold transition-all hover:scale-105"
-          >
-            Review my code →
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            asChild
-            className="gap-2 border-white/10 bg-white/5 text-foreground hover:bg-white/10"
-          >
-            <a
-              href="https://github.com/Soubhik19/AI-code-reviewer"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-              </svg>
-              CodeSensei — AI Code Reviewer
-            </a>
-          </Button>
-        </div>
-
-        {/* Language badges */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {LANGUAGES.map((lang) => (
-            <span
-              key={lang}
-              className="rounded-full border border-white/8 bg-white/4 px-3 py-1 text-xs font-medium text-muted-foreground"
-            >
-              {lang}
-            </span>
-          ))}
+        {/* RIGHT column — Lottie robot */}
+        <div className="hero-robot flex-shrink-0">
+          <div className="hero-robot-float">
+            <LottieAnim
+              animationData={heroAnimation}
+              className="hero-robot-size"
+            />
+          </div>
         </div>
       </div>
 

@@ -278,13 +278,40 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
             )}
 
             {reviewState === "loading" && (
-              <div className="flex h-full flex-col items-center justify-center gap-4">
-                <div className="flex gap-2">
-                  <span className="loading-dot" />
-                  <span className="loading-dot" />
-                  <span className="loading-dot" />
+              <div className="flex h-full flex-col gap-6 p-2">
+                {/* Typing indicator header */}
+                <div className="flex items-center gap-3">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-brand/10 ring-1 ring-brand/30">
+                    <Loader2 className="size-4 animate-spin text-brand-light" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">CodeSensei is analyzing…</p>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span className="loading-dot" />
+                      <span className="loading-dot" />
+                      <span className="loading-dot" />
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">Analyzing your code…</p>
+
+                {/* Fake streaming preview */}
+                <div className="typing-preview review-output space-y-3">
+                  <div className="typing-line" style={{ animationDelay: "0s" }}>
+                    <p className="text-sm text-muted-foreground/40">## 🔍 Code Review Summary</p>
+                  </div>
+                  <div className="typing-line" style={{ animationDelay: "0.3s" }}>
+                    <p className="text-sm text-muted-foreground/30">Analyzing code structure and patterns...</p>
+                  </div>
+                  <div className="typing-line" style={{ animationDelay: "0.6s" }}>
+                    <p className="text-sm text-muted-foreground/20">Checking for security vulnerabilities...</p>
+                  </div>
+                  <div className="typing-line" style={{ animationDelay: "0.9s" }}>
+                    <p className="text-sm text-muted-foreground/15">Evaluating performance bottlenecks...</p>
+                  </div>
+                  <div className="typing-line" style={{ animationDelay: "1.2s" }}>
+                    <p className="text-sm text-muted-foreground/10">Generating best practice suggestions...</p>
+                  </div>
+                </div>
               </div>
             )}
 

@@ -163,7 +163,9 @@ html {
 .dark ::-webkit-scrollbar-thumb { background: oklch(0.25 0.06 265); border-radius: 3px; }
 .dark ::-webkit-scrollbar-thumb:hover { background: oklch(0.55 0.22 265); }
 
-/* Gradient text */
+/* ================================================
+   GRADIENT TEXT — static version (fallback)
+   ================================================ */
 .gradient-text {
   background: linear-gradient(135deg, oklch(0.72 0.18 265) 0%, oklch(0.68 0.18 240) 100%);
   -webkit-background-clip: text;
@@ -171,7 +173,236 @@ html {
   background-clip: text;
 }
 
-/* Markdown review output styles */
+/* ================================================
+   GRADIENT TEXT — animated flowing version
+   ================================================ */
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(
+    135deg,
+    oklch(0.72 0.18 265) 0%,
+    oklch(0.68 0.18 240) 25%,
+    oklch(0.75 0.15 300) 50%,
+    oklch(0.68 0.18 240) 75%,
+    oklch(0.72 0.18 265) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-flow 4s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================================================
+   HERO — Robot Lottie Animation
+   ================================================ */
+.hero-robot-size {
+  width: 420px;
+  height: 420px;
+}
+
+@keyframes hero-float {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-15px); }
+}
+
+.hero-robot-float {
+  animation: hero-float 3s ease-in-out infinite alternate;
+}
+
+.hero-robot {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .hero-robot-size {
+    width: 280px;
+    height: 280px;
+  }
+}
+
+/* ================================================
+   HERO — Code Rain Background (Matrix-style)
+   ================================================ */
+.code-rain-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes code-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.code-rain {
+  display: flex;
+  flex-direction: column;
+  animation: code-scroll 40s linear infinite;
+}
+
+.code-rain-line {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 2.2;
+  color: oklch(0.55 0.22 265 / 4%);
+  white-space: nowrap;
+  padding-left: 5%;
+  user-select: none;
+}
+
+/* ================================================
+   NAVBAR — Glowing purple bottom line
+   ================================================ */
+@keyframes navbar-pulse {
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 8px 1px oklch(0.55 0.22 265 / 30%); }
+  50% { opacity: 1; box-shadow: 0 0 14px 2px oklch(0.55 0.22 265 / 60%); }
+}
+
+.navbar-glow-line {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, oklch(0.55 0.22 265) 30%, oklch(0.65 0.18 300) 70%, transparent 100%);
+  animation: navbar-pulse 3s ease-in-out infinite;
+}
+
+/* Navbar CS logo glow */
+.navbar-cs-logo {
+  filter: drop-shadow(0 0 4px oklch(0.55 0.22 265 / 40%));
+}
+
+/* ================================================
+   STATS BAR
+   ================================================ */
+.stats-bar {
+  border-top: 1px solid oklch(1 0 0 / 6%);
+  border-bottom: 1px solid oklch(1 0 0 / 6%);
+  background: oklch(0.09 0.02 265);
+}
+
+/* ================================================
+   COMING SOON — Shimmer Badge
+   ================================================ */
+@keyframes shimmer-sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.shimmer-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, oklch(1 0 0 / 15%) 50%, transparent 100%);
+  animation: shimmer-sweep 2s ease-in-out infinite;
+}
+
+/* ================================================
+   SCROLL REVEAL ANIMATIONS
+   ================================================ */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-reveal-card {
+  opacity: 0;
+  transform: translateY(25px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scroll-reveal-card.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================================
+   TYPING INDICATOR for Review Loading
+   ================================================ */
+@keyframes typing-appear {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.typing-line {
+  opacity: 0;
+  animation: typing-appear 0.5s ease forwards;
+}
+
+.typing-preview {
+  border-left: 2px solid oklch(0.55 0.22 265 / 20%);
+  padding-left: 1rem;
+}
+
+/* ================================================
+   CUSTOM CURSOR GLOW
+   ================================================ */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: oklch(0.55 0.22 265 / 40%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
+}
+
+/* Hide on touch devices */
+@media (hover: none) {
+  .cursor-glow {
+    display: none;
+  }
+}
+
+/* ================================================
+   NOISE TEXTURE BACKGROUND
+   ================================================ */
+.noise-bg {
+  position: relative;
+}
+
+.noise-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ================================================
+   MARKDOWN REVIEW OUTPUT STYLES
+   ================================================ */
 .review-output { font-family: var(--font-sans); line-height: 1.7; }
 
 .review-output h1,
@@ -238,7 +469,9 @@ html {
   margin: 1rem 0;
 }
 
-/* Loading dots animation */
+/* ================================================
+   LOADING DOTS ANIMATION
+   ================================================ */
 @keyframes bounce-dot {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
   40% { transform: translateY(-8px); opacity: 1; }
@@ -256,7 +489,9 @@ html {
 .loading-dot:nth-child(2) { animation-delay: 0.16s; }
 .loading-dot:nth-child(3) { animation-delay: 0.32s; }
 
-/* Pulse glow animation for navbar dot */
+/* ================================================
+   PULSE GLOW ANIMATION
+   ================================================ */
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 oklch(0.55 0.22 265 / 40%); }
   50% { opacity: 0.8; box-shadow: 0 0 0 4px oklch(0.55 0.22 265 / 0%); }

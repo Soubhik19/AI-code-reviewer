@@ -39,7 +39,7 @@ const COMING_SOON = [
 
 export function ComingSoon() {
   return (
-    <section className="px-4 py-24 sm:px-6 lg:px-8">
+    <section className="scroll-reveal px-4 py-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-14 text-center">
@@ -56,14 +56,15 @@ export function ComingSoon() {
 
         {/* Cards grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {COMING_SOON.map((item) => (
+          {COMING_SOON.map((item, i) => (
             <div
               key={item.title}
-              className="group relative overflow-hidden rounded-xl border border-white/8 bg-card p-6 transition-all duration-300 hover:border-brand/30"
+              className="group relative overflow-hidden rounded-xl border border-white/8 bg-card p-6 transition-all duration-300 hover:border-brand/30 scroll-reveal-card"
+              style={{ transitionDelay: `${i * 100}ms` }}
             >
-              {/* Coming Soon badge */}
+              {/* Coming Soon badge with shimmer */}
               <div className="absolute right-3 top-3">
-                <span className="rounded-full border border-[oklch(0.65_0.18_300/30%)] bg-[oklch(0.65_0.18_300/10%)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[oklch(0.75_0.18_300)]">
+                <span className="shimmer-badge rounded-full border border-[oklch(0.65_0.18_300/30%)] bg-[oklch(0.65_0.18_300/10%)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[oklch(0.75_0.18_300)]">
                   Coming Soon
                 </span>
               </div>
