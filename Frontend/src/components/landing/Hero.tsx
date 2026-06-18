@@ -139,9 +139,9 @@ export function Hero({ onStartReviewing }: HeroProps) {
       />
 
       {/* Two-column hero layout */}
-      <div className="relative z-10 flex w-full max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-14">
+      <div className="relative z-10 flex w-full max-w-5xl flex-col items-center justify-center gap-10 lg:flex-row lg:justify-between lg:gap-12">
         {/* LEFT column — all existing content */}
-        <div className="hero-content flex flex-1 flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+        <div className="hero-content flex w-full max-w-xl flex-col items-center gap-6 text-center lg:items-start lg:text-left">
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 px-4 py-1.5 text-sm text-brand-light">
             <span className="pulse-dot size-2 rounded-full bg-brand" />
@@ -152,7 +152,7 @@ export function Hero({ onStartReviewing }: HeroProps) {
           <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Your code reviewed
             <br />
-            <span className="gradient-text-animated">
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               {displayed}
               <span
                 style={{
@@ -174,13 +174,16 @@ export function Hero({ onStartReviewing }: HeroProps) {
 
           {/* CTA buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <Button
-              size="lg"
-              onClick={onStartReviewing}
-              className="bg-brand text-primary-foreground hover:bg-brand-light gap-2 px-7 font-semibold transition-all hover:scale-105"
-            >
-              Review my code →
-            </Button>
+            <div className="relative group">
+              <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-brand to-cyan-400 opacity-40 blur transition duration-500 group-hover:opacity-100"></div>
+              <Button
+                size="lg"
+                onClick={onStartReviewing}
+                className="relative bg-brand text-primary-foreground hover:bg-brand-light gap-2 px-7 font-semibold transition-all hover:scale-105"
+              >
+                Review my code →
+              </Button>
+            </div>
             <Button
               size="lg"
               variant="outline"
@@ -214,8 +217,10 @@ export function Hero({ onStartReviewing }: HeroProps) {
         </div>
 
         {/* RIGHT column — Lottie robot */}
-        <div className="hero-robot flex-shrink-0">
-          <div className="hero-robot-float">
+        <div className="hero-robot relative flex-shrink-0 lg:ml-auto">
+          {/* Pulsing glow behind robot */}
+          <div className="absolute left-1/2 top-1/2 size-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/20 blur-[80px]" />
+          <div className="hero-robot-float relative z-10">
             <LottieAnim
               animationData={heroAnimation}
               className="hero-robot-size"
@@ -225,8 +230,8 @@ export function Hero({ onStartReviewing }: HeroProps) {
       </div>
 
       {/* Mock UI Preview */}
-      <div className="relative z-10 mt-14 w-full max-w-4xl">
-        <div className="overflow-hidden rounded-xl border border-white/8 bg-[oklch(0.13_0.03_265)] shadow-2xl shadow-black/40">
+      <div className="relative z-10 mt-20 w-full max-w-4xl">
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl shadow-brand/10">
           {/* Window title bar */}
           <div className="flex items-center gap-2 border-b border-white/8 px-4 py-3">
             <span className="size-3 rounded-full bg-red-500/80" />
