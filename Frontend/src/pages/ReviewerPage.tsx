@@ -78,8 +78,8 @@ function extractText(node: ReactNode): string {
   if (typeof node === "number") return String(node)
   if (!node) return ""
   if (Array.isArray(node)) return node.map(extractText).join("")
-  if (typeof node === "object" && "props" in node) {
-    return extractText((node as React.ReactElement).props.children)
+  if (typeof node === "object" && node !== null && "props" in node) {
+    return extractText((node as any).props.children)
   }
   return ""
 }
@@ -112,7 +112,6 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
   const [reviewState, setReviewState] = useState<ReviewState>("idle")
   const [review, setReview] = useState("")
   const [error, setError] = useState("")
-  const [copied, setCopied] = useState(false)
 
   const handleReview = useCallback(async () => {
     if (!code.trim()) return
@@ -138,17 +137,7 @@ export default function ReviewerPage({ onBack }: ReviewerPageProps) {
     }
   }, [code, language])
 
-  const handleCopy = useCallback(async () => {
-    if (!review) return
-    // Extract only the refactored code block from ## 🚀 Refactored Code section
-    const refactoredMatch = review.match(
-      /##\s*🚀\s*Refactored Code[\s\S]*?```[\w]*\n([\s\S]*?)```/
-    )
-    const textToCopy = refactoredMatch ? refactoredMatch[1].trim() : review
-    await navigator.clipboard.writeText(textToCopy)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }, [review])
+
 
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-background text-foreground">
