@@ -151,8 +151,7 @@ export function Hero({ onStartReviewing }: HeroProps) {
           {/* Heading */}
           <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Your code reviewed
-            <br />
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            <span className="mt-2 block min-h-[3em] bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent sm:min-h-[2.5em]">
               {displayed}
               <span
                 style={{
