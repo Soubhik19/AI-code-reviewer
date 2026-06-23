@@ -5,11 +5,24 @@ const aiRoutes  = require('./routes/ai.routes');
 const app = express();
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
-// Lock to the frontend origin defined in FRONTEND_URL, fallback to localhost.
-const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+// Allow the frontend origin(s) from env, plus common Vercel preview URLs.
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost:5174',
+].filter(Boolean);
 
+// Also allow any *.vercel.app origin for preview deployments
 app.use(cors({
-  origin: allowedOrigin,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Allow any vercel.app subdomain
+    if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+    console.warn(`[CORS] Blocked origin: ${origin}`);
+    callback(null, false);
+  },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));

@@ -2,9 +2,69 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const model = genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
-});
+// Models to try in order — if the primary is overloaded, fall back
+const MODEL_CHAIN = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+];
+
+/**
+ * Sleep for the given number of milliseconds.
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Tries to generate content with retry + model fallback.
+ * - Up to 2 retries per model with exponential backoff.
+ * - Falls through the MODEL_CHAIN on persistent 503/429 errors.
+ */
+async function callWithRetry(prompt) {
+  let lastError = null;
+
+  for (const modelName of MODEL_CHAIN) {
+    const model = genAI.getGenerativeModel({ model: modelName });
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        console.log(`[ai.service] Trying ${modelName} (attempt ${attempt + 1})…`);
+        const result = await model.generateContent(prompt);
+        if (!result?.response) {
+          throw new Error('No response received from Gemini API');
+        }
+        console.log(`[ai.service] ✅ Success with ${modelName}`);
+        return result.response.text();
+      } catch (err) {
+        lastError = err;
+        const status = err?.status ?? err?.httpStatusCode ?? err?.errorDetails?.[0]?.reason;
+        const message = err?.message ?? '';
+
+        console.error(`[ai.service] ${modelName} attempt ${attempt + 1} failed:`, message);
+
+        // If it's a 503 (overloaded) or 429 (rate limit), retry with backoff
+        if (message.includes('503') || message.includes('429') ||
+            message.includes('UNAVAILABLE') || message.includes('RESOURCE_EXHAUSTED') ||
+            message.includes('overloaded') || message.includes('quota') ||
+            message.includes('high demand') ||
+            status === 503 || status === 429) {
+          const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
+          console.log(`[ai.service] Retrying in ${delay}ms…`);
+          await sleep(delay);
+          continue;
+        }
+
+        // For other errors (auth, bad request, etc.), throw immediately
+        throw err;
+      }
+    }
+    console.log(`[ai.service] All retries exhausted for ${modelName}, trying next model…`);
+  }
+
+  // All models and retries exhausted
+  throw lastError || new Error('All Gemini models failed after retries');
+}
 
 /**
  * Sends the user's code to Gemini and returns the markdown review string.
@@ -63,11 +123,7 @@ ${code}
 \`\`\`
 `;
 
-  const result = await model.generateContent(prompt);
-  if (!result?.response) {
-    throw new Error('No response received from Gemini API');
-  }
-  return result.response.text();
+  return callWithRetry(prompt);
 }
 
 module.exports = { generateContent };
