@@ -87,7 +87,10 @@ STRICT RULES:
 - Always check for: security vulnerabilities, performance bottlenecks, error handling, code smells, type safety.
 - Keep total response under 600 words excluding code blocks.
 - Use the exact language name (${language}) in code blocks for syntax highlighting.
-- In the Refactored Code section, write CLEAN production code with MINIMAL comments. Only add a comment if it explains a non-obvious safety or business decision. Do NOT add tutorial-style comments like "// Use strict equality" or "// Await the JSON parsing". The code should speak for itself.
+- CRITICAL: Prioritize CONCISENESS. The refactored code MUST NOT be significantly longer than the original code.
+- DO NOT add JSDoc blocks, type definitions, or overly verbose error handling unless explicitly necessary to fix a critical bug.
+- DO NOT over-engineer. Keep the logic simple and elegant.
+- In the Refactored Code section, write CLEAN production code with NO comments unless absolutely necessary to explain a complex business rule. The code should speak for itself.
 
 FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
 
